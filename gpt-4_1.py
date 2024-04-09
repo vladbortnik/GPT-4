@@ -1,3 +1,5 @@
+#!~/.pyenv/versions/3.12.2/envs/gpt-4/bin/python
+
 from openai import OpenAI
 import os
 import json, time
@@ -12,14 +14,14 @@ def show_json(obj):
         display(json.loads(obj.model_dump_json()))
 
 client = OpenAI(
-    api_key=os.environ['OPENAI_API_KEY_GPT_4_1'],  # this is also the default, it can be omitted
+    api_key=os.environ['OPENAI_API_KEY_GPT_4_1']
 )
 
 
 assistant = client.beta.assistants.create(
-        name="GPT",
-        instructions=f"You are a Helpfull Assistant. Answer questions briefly. The less words the better.",
-        model="gpt-4-0125-preview",
+        name="GPT-4",
+        instructions="You are a Helpfull Assistant. You name is GPT-4.1. Answer questions briefly. The less words the better.",
+        model="gpt-4-0125-preview"
 )
 ASSISTANT_ID = assistant.id
 
@@ -107,10 +109,18 @@ def create_thread_and_run(user_input):
 
 # Pretty printing helper
 def pretty_print(messages):
-    print("# Messages")
+    print("\n" + "# Messages")
     for m in messages:
         print(f"{m.role}: {m.content[0].text.value}") 
-    print('\n\n')
+    print()
+
+# Pretty printing helper (v.2)
+# def pretty_print(messages):
+#     # print("\n" + "# Messages")
+#     # for m in messages:
+#     #     print(f"{m.role}: {m.content[0].text.value}")
+#     print(f"{messages.role}: {messages.content[0].text.value}")
+#     print()
 
 
 # Waiting in a loop
@@ -154,7 +164,7 @@ def wait_on_run(run, thread):
 #     return response.choices[0].message['content'].strip()
 
 def main():
-    pp("\n\nLet's chat with GPT-4 Turbo! Type 'quit' to exit.\n\n")
+    print("\n" + "Let's chat with GPT-4 Turbo! Type 'quit' to exit." + "\n")
     
     user_input = input("You: ")
     thread, run = create_thread_and_run(user_input)
@@ -167,6 +177,8 @@ def main():
 
     while True:
         user_input = input("You: ")
+        if user_input.lower() == 'quit' or user_input.lower() == 'q':
+            break
         run = submit_message(ASSISTANT_ID, thread, user_input)
         run = wait_on_run(run, thread)
         pretty_print(get_response(thread))
